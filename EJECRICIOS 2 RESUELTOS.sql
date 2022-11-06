@@ -1,5 +1,6 @@
 
 --1.
+
 select tdv.NombreDocumento, dv.NumeroDocumento,dv.FechaDocumento, dv.Ruc, dv.NombreCliente, m.Simbolo,
 	case when m.Simbolo = 'US$'
 		then dv.Total
@@ -14,10 +15,33 @@ join moneda as m
  on m.CodigoMoneda= dv.CodigoMoneda
 join tipoDocumentoVenta as tdv
  on tdv.CodigoTipoDocumento=dv.CodigoTipoDocumento
+-- Acá realicé un group by para asegurarme que no hay registros repetidos; sin embargo, no es necesario
 group by tdv.NombreDocumento, dv.NumeroDocumento,dv.FechaDocumento, dv.Ruc, dv.NombreCliente, m.Simbolo, dv.NumeroDocumento, dv.Total
 
 
+--2. 
+
+select tdv.NombreDocumento, dv.NumeroDocumento,dv.FechaDocumento, dv.Ruc, dv.NombreCliente, m.Simbolo,
+	case when m.Simbolo = 'US$'
+		then dv.Total
+		else 0
+		end as 'Importe Dolares',
+	case when dv.Total > 5000
+		then 'SI'
+		else 'NO'
+		end as 'Mayor a 5000'
+from DocumentoVenta as dv
+join moneda as m
+ on m.CodigoMoneda= dv.CodigoMoneda
+join tipoDocumentoVenta as tdv
+ on tdv.CodigoTipoDocumento=dv.CodigoTipoDocumento
+ where m.Simbolo = 'US$'
+-- No es necesario el group by ni el order by. Solo es para comprobar el código sea correcto
+group by tdv.NombreDocumento, dv.NumeroDocumento,dv.FechaDocumento, dv.Ruc, dv.NombreCliente, m.Simbolo, dv.NumeroDocumento, dv.Total
+order by dv.Total
+
 --3. 
+
 select tdv.NombreDocumento, dv.NumeroDocumento,dv.FechaDocumento, dv.Ruc, dv.NombreCliente, m.Simbolo,
 	case when m.Simbolo = 'US$'
 		then dv.Total
@@ -36,29 +60,12 @@ join moneda as m
 join tipoDocumentoVenta as tdv
  on tdv.CodigoTipoDocumento=dv.CodigoTipoDocumento
  where m.Simbolo = 'US$'
-group by tdv.NombreDocumento, dv.NumeroDocumento,dv.FechaDocumento, dv.Ruc, dv.NombreCliente, m.Simbolo, dv.NumeroDocumento, dv.Total
-order by dv.Total
-
---2. 
-select tdv.NombreDocumento, dv.NumeroDocumento,dv.FechaDocumento, dv.Ruc, dv.NombreCliente, m.Simbolo,
-	case when m.Simbolo = 'US$'
-		then dv.Total
-		else 0
-		end as 'Importe Dolares',
-	case when dv.Total > 5000
-		then 'SI'
-		else 'NO'
-		end as 'Mayor a 5000'
-from DocumentoVenta as dv
-join moneda as m
- on m.CodigoMoneda= dv.CodigoMoneda
-join tipoDocumentoVenta as tdv
- on tdv.CodigoTipoDocumento=dv.CodigoTipoDocumento
- where m.Simbolo = 'US$'
+-- De la misma manera que en el ejercicio anterior, no es necesario el group by y el order by para estos casos 
 group by tdv.NombreDocumento, dv.NumeroDocumento,dv.FechaDocumento, dv.Ruc, dv.NombreCliente, m.Simbolo, dv.NumeroDocumento, dv.Total
 order by dv.Total
 
 --4.
+
 select case when CodigoTipoDocumento= '01'
 			then 'Factura'
 			else case when CodigoTipoDocumento= '03'
@@ -75,10 +82,13 @@ select case when CodigoTipoDocumento= '01'
 								 end
 						end
 			  end as 'TipoDocumento',
+-- NOTA: para cada case when, es necesario que se cierre con un 'end'; así el programa entenderá que se ha querido cerrar un proceso abierto.
+-- En caso no lo hagan, les saltará un error sobre escritura de código.
 NumeroDocumento, FechaDocumento, Ruc, NombreCliente
 from DocumentoVenta
 
 --5. 
+
 select tdv.NombreDocumento, dv.NumeroDocumento, dv.FechaDocumento, dv.Ruc, dv.NombreCliente, 
 	case when dv.CodigoMoneda= 'PEN'
 		 then dv.Total
@@ -93,8 +103,9 @@ join tipoDocumentoVenta as tdv
  where dv.FechaDocumento like '%2014%'
  order by dv.FechaDocumento
 
- --6.
- select tdv.NombreDocumento as 'TipoDocumento', dv.Ruc, dv. NombreCliente, m.Simbolo,
+--6.
+
+select tdv.NombreDocumento as 'TipoDocumento', dv.Ruc, dv. NombreCliente, m.Simbolo,
  	case when m.Simbolo = 'US$'
 		then dv.Total
 		else 0
@@ -108,12 +119,12 @@ join tipoDocumentoVenta as tdv
   on m.CodigoMoneda= dv.CodigoMoneda
  join tipoDocumentoVenta as tdv
  on tdv.CodigoTipoDocumento= dv.CodigoTipoDocumento
- 
  group by tdv.NombreDocumento, dv.NumeroDocumento, dv.FechaDocumento, dv.Ruc, dv.NombreCliente, m.Simbolo, dv.Total
  order by dv.NombreCliente
 
  --7.
- select dv.ruc, dv.NombreCliente,
+
+select dv.ruc, dv.NombreCliente,
  case when dv.CodigoMoneda= 'PEN'
 		 then dv.Total
 		 else (dv.Total/tc.tc_venta)
